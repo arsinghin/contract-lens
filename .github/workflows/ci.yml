@@ -30,6 +30,11 @@ jobs:
       - name: Run linter
         run: npm run lint
 
+      - name: Run legal reasoning benchmark evaluation
+        run: npm test
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+
       - name: Test production build
         run: npm run build
         env:

@@ -174,6 +174,15 @@ export default function WorkspacePage() {
     <div className="min-h-screen bg-stone-100/60 text-stone-900 flex flex-col font-sans">
       <Navbar />
 
+      {/* Screen Reader Live Region for status announcements */}
+      <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+        {analyzing
+          ? "Analyzing contract clauses and risk obligations..."
+          : activeDoc
+          ? `Loaded document ${activeDoc.name}. ${activeDoc.clauses.length} clauses and ${activeDoc.findings.length} findings available.`
+          : "Ready. Select or upload a legal agreement to analyze."}
+      </div>
+
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         {/* Document Selection & Header */}
         <DocumentHeader

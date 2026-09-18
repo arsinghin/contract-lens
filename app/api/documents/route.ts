@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAllDocuments, createDocumentFromUpload } from "@/lib/documents/document-service";
 import { SYNTHETIC_DOCUMENTS } from "@/lib/data/synthetic-documents";
+import { checkRateLimit } from "@/lib/security/rate-limiter";
 
 export async function GET() {
   try {
@@ -16,6 +17,26 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
+    // Rate limit: 30 requests per minute per IP
+    const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0] || "global-client";
+    const rateCheck = checkRateLimit(`upload-${clientIp}`, { maxRequests: 30, intervalMs: 60 * 1000 });
+
+    if (!rateCheck.allowed) {
+      return NextResponse.json(
+        {
+          error: {
+            code: "RATE_LIMIT_EXCEEDED",
+            message: `Too many upload requests. Please retry in ${Math.ceil(rateCheck.resetInMs / 1000)} seconds.`,
+          },
+        },
+        {
+          status: 429,
+          headers: {
+            "Retry-After": Math.ceil(rateCheck.resetInMs / 1000).toString(),
+          },
+        }
+      );
+    }
     const contentType = req.headers.get("content-type") || "";
 
     if (contentType.includes("application/json")) {
