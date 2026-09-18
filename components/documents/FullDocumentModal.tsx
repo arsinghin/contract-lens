@@ -2,7 +2,7 @@
 
 import { DocumentRecord, Evidence } from "@/lib/types";
 import { X, FileText, Search } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 interface FullDocumentModalProps {
   isOpen?: boolean;
@@ -13,11 +13,12 @@ interface FullDocumentModalProps {
 
 export function FullDocumentModal({
   isOpen = true,
-  document,
+  document: docRecord,
   onClose,
   activeEvidence,
 }: FullDocumentModalProps) {
   const [search, setSearch] = useState("");
+  const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -25,23 +26,62 @@ export function FullDocumentModal({
       if (e.key === "Escape") {
         e.preventDefault();
         onClose();
+      } else if (e.key === "Tab" && modalRef.current) {
+        // Focus trapping
+        const focusable = modalRef.current.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusable.length > 0) {
+          const first = focusable[0];
+          const last = focusable[focusable.length - 1];
+          const currentEl = window.document.activeElement;
+          if (e.shiftKey && currentEl === first) {
+            e.preventDefault();
+            last.focus();
+          } else if (!e.shiftKey && currentEl === last) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
       }
     };
+
+    // Auto-focus search field on modal open
+    const timer = setTimeout(() => {
+      if (modalRef.current) {
+        const input = modalRef.current.querySelector<HTMLInputElement>("input");
+        if (input) input.focus();
+        else {
+          const first = modalRef.current.querySelector<HTMLElement>(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+          );
+          first?.focus();
+        }
+      }
+    }, 50);
+
     window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
   }, [isOpen, onClose]);
 
-  if (!isOpen || !document) return null;
+  if (!isOpen || !docRecord) return null;
 
-  const rawText = document.rawText || document.pages.map((p) => p.text).join("\n\n");
+  const rawText = docRecord.rawText || docRecord.pages.map((p) => p.text).join("\n\n");
 
   return (
     <div
       id="modal-full-document-backdrop"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-full-doc-title"
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-xs animate-in fade-in duration-150"
       onClick={onClose}
     >
       <div
+        ref={modalRef}
         id="modal-full-document-card"
         className="w-full max-w-4xl bg-white rounded-xl shadow-2xl border border-stone-200 overflow-hidden flex flex-col max-h-[88vh]"
         onClick={(e) => e.stopPropagation()}
@@ -53,11 +93,11 @@ export function FullDocumentModal({
               <FileText className="w-4 h-4 text-amber-400" />
             </div>
             <div>
-              <h3 className="text-sm font-semibold text-stone-900 leading-snug">
-                {document.name}
+              <h3 id="modal-full-doc-title" className="text-sm font-semibold text-stone-900 leading-snug">
+                {docRecord.name}
               </h3>
               <p className="text-xs text-stone-500">
-                Full text inspection · {document.pages.length} page(s) · {document.clauses.length} clauses detected
+                Full text inspection · {docRecord.pages.length} page(s) · {docRecord.clauses.length} clauses detected
               </p>
             </div>
           </div>
@@ -98,7 +138,7 @@ export function FullDocumentModal({
 
         {/* Footer */}
         <div className="px-6 py-3 border-t border-stone-200 bg-stone-50 flex items-center justify-between text-xs text-stone-500">
-          <span>Source Document Record: {document.id}</span>
+          <span>Source Document Record: {docRecord.id}</span>
           <button
             id="btn-close-full-doc-modal-footer"
             type="button"

@@ -14,6 +14,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
+    "test": "node --import tsx/esm scripts/run-eval.ts",
     "clean": "next clean"
   },
   "dependencies": {

@@ -5,6 +5,7 @@ import { DocumentRecord, Evidence } from "@/lib/types";
 import { Navbar } from "@/components/Navbar";
 import { EvidenceViewerModal } from "@/components/evidence/EvidenceViewerModal";
 import { FullDocumentModal } from "@/components/documents/FullDocumentModal";
+import { DocumentHeader } from "@/components/documents/DocumentHeader";
 import { ClauseExplorer } from "@/components/clauses/ClauseExplorer";
 import { ObligationExplorer } from "@/components/obligations/ObligationExplorer";
 import { FindingsView } from "@/components/findings/FindingsView";
@@ -12,21 +13,15 @@ import { TimelineView } from "@/components/timeline/TimelineView";
 import { QASection } from "@/components/questions/QASection";
 import { LawyerPrepView } from "@/components/lawyer-prep/LawyerPrepView";
 import {
-  FileText,
-  UploadCloud,
   Sparkles,
   AlertTriangle,
-  CheckCircle2,
-  Calendar,
   Users,
-  Shield,
   Layers,
   HelpCircle,
-  Clock,
   Briefcase,
   PlayCircle,
   FileCheck,
-  RefreshCw,
+  Clock,
   Loader2,
 } from "lucide-react";
 
@@ -180,160 +175,16 @@ export default function WorkspacePage() {
       <Navbar />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-        {/* Document Selection & Demo Bar */}
-        <div id="demo-scenario" className="bg-white border border-stone-200 rounded-xl p-4 shadow-xs">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs font-semibold text-stone-500 uppercase tracking-wider flex items-center gap-1.5 mr-1">
-                <PlayCircle className="w-4 h-4 text-amber-500" />
-                Preloaded Contracts:
-              </span>
-
-              <button
-                onClick={() => handleSelectSample("employment-v1")}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border ${
-                  selectedDocId === "employment-v1"
-                    ? "bg-stone-900 text-stone-50 border-stone-900 shadow-xs"
-                    : "bg-stone-50 hover:bg-stone-100 text-stone-700 border-stone-200"
-                }`}
-              >
-                Employment Agreement (v1 - Conflicting Notice)
-              </button>
-
-              <button
-                onClick={() => handleSelectSample("employment-v2")}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border ${
-                  selectedDocId === "employment-v2"
-                    ? "bg-stone-900 text-stone-50 border-stone-900 shadow-xs"
-                    : "bg-stone-50 hover:bg-stone-100 text-stone-700 border-stone-200"
-                }`}
-              >
-                Employment Agreement (v2 - 90-Day & Non-Compete)
-              </button>
-
-              <button
-                onClick={() => handleSelectSample("prompt-injection-test")}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border ${
-                  selectedDocId === "prompt-injection-test"
-                    ? "bg-stone-900 text-stone-50 border-stone-900 shadow-xs"
-                    : "bg-stone-50 hover:bg-stone-100 text-stone-700 border-stone-200"
-                }`}
-              >
-                Adversarial Prompt Injection Test
-              </button>
-            </div>
-
-            {/* Upload control */}
-            <div className="flex items-center gap-2">
-              <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-800 border border-stone-200 transition-colors">
-                <UploadCloud className="w-3.5 h-3.5 text-stone-600" />
-                <span>Upload PDF / Text</span>
-                <input
-                  type="file"
-                  accept=".pdf,.txt,.md"
-                  onChange={handleFileUpload}
-                  className="hidden"
-                />
-              </label>
-            </div>
-          </div>
-        </div>
-
-        {/* Active Document Header Card */}
-        {activeDoc && (
-          <div className="bg-white border border-stone-200 rounded-xl p-6 shadow-xs space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2.5">
-                  <span className="capitalize text-[11px] font-bold uppercase px-2 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-200">
-                    {activeDoc.documentType}
-                  </span>
-                  <span className="text-xs font-mono text-stone-400">
-                    ID: {activeDoc.id}
-                  </span>
-                </div>
-                <h1 className="text-xl font-bold tracking-tight text-stone-900">
-                  {activeDoc.name}
-                </h1>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setShowFullDoc(true)}
-                  className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-800 border border-stone-200 transition-colors"
-                >
-                  <FileText className="w-3.5 h-3.5 text-stone-600" />
-                  <span>Inspect Full Document Text</span>
-                </button>
-
-                <button
-                  onClick={handleReanalyze}
-                  disabled={analyzing}
-                  className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-lg bg-stone-900 text-stone-50 hover:bg-stone-800 transition-colors shadow-xs disabled:opacity-50"
-                >
-                  {analyzing ? (
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  ) : (
-                    <RefreshCw className="w-3.5 h-3.5 text-amber-400" />
-                  )}
-                  <span>Re-analyze</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Metadata Bar */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-stone-100 text-xs">
-              <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-stone-400 shrink-0" />
-                <div>
-                  <span className="text-stone-400 block text-[10px] uppercase">
-                    Effective Date
-                  </span>
-                  <span className="font-medium text-stone-800">
-                    {activeDoc.effectiveDate || "Not established"}
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <Users className="w-4 h-4 text-stone-400 shrink-0" />
-                <div>
-                  <span className="text-stone-400 block text-[10px] uppercase">
-                    Parties Identified
-                  </span>
-                  <span className="font-medium text-stone-800 truncate">
-                    {activeDoc.parties.map((p) => p.name).join(", ") || "None"}
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <Layers className="w-4 h-4 text-stone-400 shrink-0" />
-                <div>
-                  <span className="text-stone-400 block text-[10px] uppercase">
-                    Extracted Clauses
-                  </span>
-                  <span className="font-medium text-stone-800 font-mono">
-                    {activeDoc.clauses.length} clauses
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <Shield className="w-4 h-4 text-stone-400 shrink-0" />
-                <div>
-                  <span className="text-stone-400 block text-[10px] uppercase">
-                    Grounding Status
-                  </span>
-                  <span className="font-medium text-emerald-700 flex items-center gap-1">
-                    <CheckCircle2 className="w-3.5 h-3.5" />
-                    Verified Citations
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* Document Selection & Header */}
+        <DocumentHeader
+          activeDoc={activeDoc}
+          selectedDocId={selectedDocId}
+          analyzing={analyzing}
+          onSelectSample={handleSelectSample}
+          onFileUpload={handleFileUpload}
+          onInspectFullDoc={() => setShowFullDoc(true)}
+          onReanalyze={handleReanalyze}
+        />
 
         {/* Tab Navigation */}
         <div className="border-b border-stone-200">

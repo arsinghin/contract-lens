@@ -2,7 +2,7 @@
 
 import { Evidence } from "@/lib/types";
 import { X, CheckCircle2, AlertTriangle, FileText, Bookmark, ArrowUpRight } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 interface EvidenceViewerModalProps {
   evidence: Evidence | null;
@@ -19,16 +19,49 @@ export function EvidenceViewerModal({
   onClose,
   onOpenFullDocument,
 }: EvidenceViewerModalProps) {
+  const modalRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     if (!evidence) return;
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         e.preventDefault();
         onClose();
+      } else if (e.key === "Tab" && modalRef.current) {
+        // Focus trapping
+        const focusable = modalRef.current.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusable.length > 0) {
+          const first = focusable[0];
+          const last = focusable[focusable.length - 1];
+          const currentEl = document.activeElement;
+          if (e.shiftKey && currentEl === first) {
+            e.preventDefault();
+            last.focus();
+          } else if (!e.shiftKey && currentEl === last) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
       }
     };
+
+    // Auto-focus first interactive element on open
+    const timer = setTimeout(() => {
+      if (modalRef.current) {
+        const first = modalRef.current.querySelector<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        first?.focus();
+      }
+    }, 50);
+
     window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
   }, [evidence, onClose]);
 
   if (!evidence) return null;
@@ -38,10 +71,14 @@ export function EvidenceViewerModal({
   return (
     <div
       id="modal-evidence-viewer-backdrop"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-evidence-title"
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-xs animate-in fade-in duration-150"
       onClick={onClose}
     >
       <div
+        ref={modalRef}
         id="modal-evidence-viewer-card"
         className="w-full max-w-2xl bg-white rounded-xl shadow-2xl border border-stone-200 overflow-hidden"
         onClick={(e) => e.stopPropagation()}
@@ -53,7 +90,7 @@ export function EvidenceViewerModal({
               <Bookmark className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-sm font-semibold text-stone-900">
+              <h3 id="modal-evidence-title" className="text-sm font-semibold text-stone-900">
                 {title || "Supporting Document Evidence"}
               </h3>
               <p className="text-xs text-stone-500">

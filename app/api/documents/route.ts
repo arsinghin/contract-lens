@@ -59,6 +59,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // MIME and file extension validation
+    const allowedExtensions = [".pdf", ".txt", ".md", ".json"];
+    const hasValidExt = allowedExtensions.some((ext) => file.name.toLowerCase().endsWith(ext));
+    const allowedTypes = ["application/pdf", "text/plain", "text/markdown", "application/json", "application/octet-stream"];
+    const hasValidType = allowedTypes.includes(file.type) || file.type === "";
+
+    if (!hasValidExt && !hasValidType) {
+      return NextResponse.json(
+        { error: { code: "UNSUPPORTED_MEDIA_TYPE", message: "Only PDF (.pdf), Plain Text (.txt), and Markdown (.md) documents are supported." } },
+        { status: 415 }
+      );
+    }
+
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
     
