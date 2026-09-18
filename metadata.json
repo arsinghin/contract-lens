@@ -1,0 +1,6 @@
+{
+  "name": "LexLens",
+  "description": "Evidence-backed legal document understanding, clause extraction, obligations, findings, grounded Q&A, and document comparison.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
