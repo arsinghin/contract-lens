@@ -167,7 +167,7 @@ LexLens ships with a rigorous test suite evaluating extraction fidelity, halluci
 ---
 
 ## 👤 Author & Owner
-This project is conceived, developed, and maintained by **[Alok Ranjan Singh](https://github.com/arsinghin/)**.
+This project is conceived, developed, and maintained by **[AR Singh](https://github.com/arsinghin/)**.
 
 - **GitHub Profile**: [@arsinghin](https://github.com/arsinghin/)
 - **Repository**: [https://github.com/arsinghin/contract-lens](https://github.com/arsinghin/contract-lens)
@@ -176,4 +176,4 @@ This project is conceived, developed, and maintained by **[Alok Ranjan Singh](ht
 
 ## 📄 License
 
-This project is authored and owned by [Alok Ranjan Singh](https://github.com/arsinghin/) and licensed under the [MIT License](LICENSE) — see the [LICENSE](LICENSE) file for details.
+This project is authored and owned by [AR Singh](https://github.com/arsinghin/) and licensed under the [MIT License](LICENSE) — see the [LICENSE](LICENSE) file for details.

@@ -73,7 +73,7 @@ export default function ComparePage() {
             rel="noopener noreferrer"
             className="font-medium text-stone-800 hover:text-stone-950 underline underline-offset-2"
           >
-            Alok Ranjan Singh
+            AR Singh
           </a>
         </p>
       </footer>

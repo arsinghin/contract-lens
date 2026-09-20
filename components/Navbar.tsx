@@ -78,7 +78,7 @@ export function Navbar() {
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center p-2 rounded-lg border border-stone-200 text-stone-700 bg-white hover:bg-stone-100 hover:text-stone-950 transition-colors shadow-2xs"
-            title="GitHub: arsinghin/contract-lens (Alok Ranjan Singh)"
+            title="GitHub: arsinghin/contract-lens (AR Singh)"
             aria-label="GitHub Repository"
           >
             <Github className="w-4 h-4" />

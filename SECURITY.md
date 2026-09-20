@@ -5,7 +5,7 @@
 If you discover a security vulnerability within LexLens, please do not disclose it publicly via GitHub issues or discussions.
 
 Instead, please submit reports directly to the project owner:
-- **Project Owner**: [Alok Ranjan Singh](https://github.com/arsinghin/)
+- **Project Owner**: [AR Singh](https://github.com/arsinghin/)
 - **Method**: Open a private vulnerability report via GitHub Security Advisories or contact directly via GitHub profile: [https://github.com/arsinghin/](https://github.com/arsinghin/)
 
 Please include:

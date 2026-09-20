@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "description": "Open-source contract review workspace with clause breakdown, obligation milestones, and evidence-grounded Q&A.",
-  "author": "Alok Ranjan Singh <https://github.com/arsinghin/>",
+  "author": "AR Singh <https://github.com/arsinghin/>",
   "repository": {
     "type": "git",
     "url": "https://github.com/arsinghin/contract-lens.git"
