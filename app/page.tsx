@@ -46,6 +46,7 @@ export default function WorkspacePage() {
 
   // Full Document Text Modal State
   const [showFullDoc, setShowFullDoc] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   // Load documents on mount
   const fetchDocuments = async () => {
@@ -119,6 +120,7 @@ export default function WorkspacePage() {
     if (!file) return;
 
     setAnalyzing(true);
+    setUploadError(null);
     try {
       const formData = new FormData();
       formData.append("file", file);
@@ -127,17 +129,45 @@ export default function WorkspacePage() {
         method: "POST",
         body: formData,
       });
+
+      const contentType = uploadRes.headers.get("content-type") || "";
+      if (!contentType.includes("application/json")) {
+        const textBody = await uploadRes.text();
+        throw new Error(
+          uploadRes.status === 413
+            ? "The uploaded file exceeds the 10MB upload limit."
+            : uploadRes.status === 429
+            ? "Upload rate limit reached. Please wait a minute and retry."
+            : `Server returned non-JSON response (${uploadRes.status}): ${textBody.substring(0, 100)}`
+        );
+      }
+
       const uploadData = await uploadRes.json();
+      if (!uploadRes.ok || uploadData.error) {
+        throw new Error(uploadData.error?.message || "Failed to upload document");
+      }
+
       const docId = uploadData.documentId;
 
       // Analyze newly uploaded document
-      await fetch(`/api/documents/${docId}/analyze`, { method: "POST" });
+      const analyzeRes = await fetch(`/api/documents/${docId}/analyze`, { method: "POST" });
+      const analyzeContentType = analyzeRes.headers.get("content-type") || "";
+      if (analyzeContentType.includes("application/json")) {
+        const analyzeData = await analyzeRes.json();
+        if (analyzeData.error) {
+          console.warn("Auto-analysis had a warning:", analyzeData.error);
+        }
+      }
+
       await fetchDocuments();
       setSelectedDocId(docId);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error uploading file", err);
+      setUploadError(err.message || "An unexpected error occurred while uploading the document.");
     } finally {
       setAnalyzing(false);
+      // Reset input value so re-uploading the same file triggers onChange
+      e.target.value = "";
     }
   };
 
@@ -176,6 +206,25 @@ export default function WorkspacePage() {
       </div>
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+        {uploadError && (
+          <div className="bg-rose-50 border border-rose-200 text-rose-800 rounded-xl p-4 flex items-start justify-between gap-3 text-xs shadow-2xs">
+            <div className="flex items-start gap-2.5">
+              <AlertTriangle className="w-4 h-4 text-rose-600 mt-0.5 shrink-0" />
+              <div>
+                <p className="font-semibold text-rose-900">Upload Failed</p>
+                <p className="text-rose-700 mt-0.5">{uploadError}</p>
+              </div>
+            </div>
+            <button
+              onClick={() => setUploadError(null)}
+              className="text-rose-500 hover:text-rose-700 font-bold px-1.5 py-0.5 rounded text-sm transition-colors"
+              aria-label="Dismiss error"
+            >
+              ×
+            </button>
+          </div>
+        )}
+
         {/* Document Selection & Header */}
         <DocumentHeader
           activeDoc={activeDoc}

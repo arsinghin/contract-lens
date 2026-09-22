@@ -58,16 +58,16 @@ export async function generateContentWithFallback(options: GenerateOptions): Pro
         console.warn(`Model ${model} (attempt ${attempt + 1}) call failed or timed out:`, err.message || err);
         lastError = err;
 
-        // If 503 (high demand) or 429, wait briefly before next attempt
-        const isTransient =
+        // If 503 (temporary high demand spike), wait briefly before retrying same model.
+        // For 429 (rate/quota limit), immediately advance to next model to avoid compounding delays.
+        const isDemandSpike =
           err?.status === "UNAVAILABLE" ||
           err?.code === 503 ||
           err?.message?.includes("503") ||
-          err?.message?.includes("high demand") ||
-          err?.message?.includes("429");
+          err?.message?.includes("high demand");
 
-        if (isTransient && attempt === 0) {
-          await new Promise((r) => setTimeout(r, 1200));
+        if (isDemandSpike && attempt === 0) {
+          await new Promise((r) => setTimeout(r, 800));
           continue;
         }
         break;

@@ -111,7 +111,7 @@ export function validateAndTransformAnalysis(
     return {
       id: `party_${documentId}_${idx + 1}`,
       name: p.name,
-      role: p.role,
+      role: p.role ?? undefined,
       type: (p.type === "person" || p.type === "organization") ? p.type : "unknown",
       evidenceIds,
     };
@@ -123,14 +123,14 @@ export function validateAndTransformAnalysis(
     return {
       id: `clause_${documentId}_${idx + 1}`,
       documentId,
-      sectionNumber: c.sectionNumber,
+      sectionNumber: c.sectionNumber ?? undefined,
       category: (c.category.toLowerCase().replace(/[\s-]+/g, "_") as any) || "other",
       title: c.title,
       summary: c.summary,
       partyIds: [],
       evidenceIds: [evId],
       confidence: typeof c.confidence === "number" ? Math.min(1, Math.max(0, c.confidence)) : 0.9,
-      interpretation: c.interpretation,
+      interpretation: c.interpretation ?? undefined,
     };
   });
 
@@ -142,10 +142,10 @@ export function validateAndTransformAnalysis(
       documentId,
       partyName: o.partyName,
       action: o.action,
-      condition: o.condition,
-      deadline: o.deadline,
+      condition: o.condition ?? undefined,
+      deadline: o.deadline ?? undefined,
       deadlineType: (o.deadlineType as any) || "event_based",
-      consequence: o.consequence,
+      consequence: o.consequence ?? undefined,
       evidenceIds: [evId],
       confidence: typeof o.confidence === "number" ? Math.min(1, Math.max(0, o.confidence)) : 0.9,
     };
@@ -158,9 +158,9 @@ export function validateAndTransformAnalysis(
       id: `time_${documentId}_${idx + 1}`,
       documentId,
       label: t.label,
-      date: t.date,
-      relativeTime: t.relativeTime,
-      trigger: t.trigger,
+      date: t.date ?? undefined,
+      relativeTime: t.relativeTime ?? undefined,
+      trigger: t.trigger ?? undefined,
       description: t.description,
       evidenceIds: [evId],
       confidence: typeof t.confidence === "number" ? Math.min(1, Math.max(0, t.confidence)) : 0.9,
@@ -185,7 +185,7 @@ export function validateAndTransformAnalysis(
       confidence: typeof f.confidence === "number" ? Math.min(1, Math.max(0, f.confidence)) : 0.85,
       evidenceIds: evIds,
       relatedClauseIds: [],
-      uncertainty: f.uncertainty,
+      uncertainty: f.uncertainty ?? undefined,
     };
   });
 
@@ -199,9 +199,9 @@ export function validateAndTransformAnalysis(
   return {
     documentType: validDocType,
     parties,
-    effectiveDate: parsed.effectiveDate,
-    startDate: parsed.startDate,
-    endDate: parsed.endDate,
+    effectiveDate: parsed.effectiveDate ?? undefined,
+    startDate: parsed.startDate ?? undefined,
+    endDate: parsed.endDate ?? undefined,
     clauses,
     obligations,
     timelineEvents,

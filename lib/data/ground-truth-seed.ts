@@ -446,6 +446,180 @@ export function getSeededDocumentRecord(docId: string): DocumentRecord | null {
     };
   }
 
+  if (docId === "nda-mutual") {
+    const evNdaDate = makeEv("ev_nda_date", "entered into as of March 1, 2025", "Preamble");
+    const evNdaP1 = makeEv("ev_nda_p1", "APEX GLOBAL TECHNOLOGIES INC. (\"Apex\")", "Preamble");
+    const evNdaP2 = makeEv("ev_nda_p2", "BRIGHTPATH LOGISTICS LLC (\"BrightPath\")", "Preamble");
+    const evNdaPurp = makeEv("ev_nda_purp", "potential strategic supply chain partnership (the \"Purpose\")", "Section 1");
+    const evNdaCare = makeEv("ev_nda_care", "exercise at least reasonable care to protect disclosed confidential information", "Section 3.1");
+    const evNdaLim = makeEv("ev_nda_lim", "use the Confidential Information solely for the Purpose and disclose it only to employees with a strict need to know", "Section 3.2");
+    const evNdaRet = makeEv("ev_nda_ret", "Within ten (10) business days of written request, the receiving party shall return or certify destruction", "Section 3.3");
+    const evNdaDur = makeEv("ev_nda_dur", "remain in effect for two (2) years from the date of disclosure", "Section 5");
+    const evNdaGov = makeEv("ev_nda_gov", "governed by Delaware law", "Section 6");
+
+    const parties: Party[] = [
+      { id: "p_nda_1", name: "APEX GLOBAL TECHNOLOGIES INC.", role: "Disclosing / Receiving Party", type: "organization", evidenceIds: [evNdaP1] },
+      { id: "p_nda_2", name: "BRIGHTPATH LOGISTICS LLC", role: "Disclosing / Receiving Party", type: "organization", evidenceIds: [evNdaP2] },
+    ];
+
+    const clauses: Clause[] = [
+      {
+        id: "cl_nda_1",
+        documentId: syn.id,
+        sectionNumber: "1",
+        title: "Purpose",
+        category: "general",
+        summary: "Parties explore a potential strategic supply chain partnership.",
+        confidence: 0.99,
+        evidenceIds: [evNdaPurp],
+      },
+      {
+        id: "cl_nda_2",
+        documentId: syn.id,
+        sectionNumber: "2",
+        title: "Confidential Information",
+        category: "confidentiality",
+        summary: "Defines confidential information including proprietary data, financial projections, software algorithms, and customer metrics.",
+        confidence: 0.99,
+        evidenceIds: [],
+      },
+      {
+        id: "cl_nda_3",
+        documentId: syn.id,
+        sectionNumber: "3",
+        title: "Obligations of Receiving Party",
+        category: "confidentiality",
+        summary: "Receiving party must use at least reasonable care, use information solely for Purpose, and return/destroy within 10 business days upon request.",
+        confidence: 0.99,
+        evidenceIds: [evNdaCare, evNdaLim, evNdaRet],
+      },
+      {
+        id: "cl_nda_4",
+        documentId: syn.id,
+        sectionNumber: "4",
+        title: "Exclusions",
+        category: "confidentiality",
+        summary: "Standard exclusions for publicly known information, prior knowledge, and independent development.",
+        confidence: 0.98,
+        evidenceIds: [],
+      },
+      {
+        id: "cl_nda_5",
+        documentId: syn.id,
+        sectionNumber: "5",
+        title: "Duration",
+        category: "term",
+        summary: "Confidentiality obligations remain in effect for two (2) years from disclosure.",
+        confidence: 0.99,
+        evidenceIds: [evNdaDur],
+      },
+      {
+        id: "cl_nda_6",
+        documentId: syn.id,
+        sectionNumber: "6",
+        title: "Governing Law",
+        category: "governing_law",
+        summary: "Governed by the laws of the State of Delaware.",
+        confidence: 0.99,
+        evidenceIds: [evNdaGov],
+      },
+    ];
+
+    const obligations: Obligation[] = [
+      {
+        id: "obl_nda_1",
+        documentId: syn.id,
+        clauseId: "cl_nda_3",
+        partyName: "Receiving Party",
+        action: "Exercise at least reasonable care to protect disclosed confidential information",
+        confidence: 0.98,
+        evidenceIds: [evNdaCare],
+      },
+      {
+        id: "obl_nda_2",
+        documentId: syn.id,
+        clauseId: "cl_nda_3",
+        partyName: "Receiving Party",
+        action: "Use Confidential Information solely for Purpose and disclose only to employees with strict need to know",
+        confidence: 0.98,
+        evidenceIds: [evNdaLim],
+      },
+      {
+        id: "obl_nda_3",
+        documentId: syn.id,
+        clauseId: "cl_nda_3",
+        partyName: "Receiving Party",
+        action: "Return or certify destruction of all confidential materials within ten (10) business days of written request",
+        deadline: "Within 10 business days of written request",
+        confidence: 0.99,
+        evidenceIds: [evNdaRet],
+      },
+    ];
+
+    const timelineEvents: TimelineEvent[] = [
+      {
+        id: "tl_nda_1",
+        label: "Effective Date",
+        date: "2025-03-01",
+        description: "Agreement entered into as of March 1, 2025",
+        evidenceIds: [evNdaDate],
+        confidence: 0.99,
+      },
+      {
+        id: "tl_nda_2",
+        label: "Confidentiality Expiration",
+        relativeTime: "Two (2) years from disclosure",
+        description: "Obligations of confidentiality remain active for 2 years from date of disclosure",
+        evidenceIds: [evNdaDur],
+        confidence: 0.99,
+      },
+      {
+        id: "tl_nda_3",
+        label: "Return of Information Window",
+        relativeTime: "Within ten (10) business days",
+        description: "Deadline to return or certify destruction following written request",
+        evidenceIds: [evNdaRet],
+        confidence: 0.98,
+      },
+    ];
+
+    const findings: Finding[] = [
+      {
+        id: "find_nda_1",
+        documentId: syn.id,
+        type: "other",
+        title: "Standard Bilateral Mutual NDA Structure",
+        description: "Agreement contains balanced mutual confidentiality terms with reasonable 2-year duration and standard carve-outs.",
+        severity: "low",
+        confidence: 0.95,
+        evidenceIds: [evNdaDur],
+        relatedClauseIds: ["cl_nda_5"],
+      },
+    ];
+
+    return {
+      id: syn.id,
+      name: syn.name,
+      mimeType: "text/plain",
+      pageCount: pages.length,
+      rawText,
+      documentType: "nda",
+      documentTypeConfidence: 0.99,
+      parties,
+      effectiveDate: "2025-03-01",
+      pages,
+      clauses,
+      obligations,
+      timelineEvents,
+      findings,
+      questions: [],
+      evidence: evidenceMap,
+      analysisStatus: "completed",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+  }
+
   if (docId === "prompt-injection-test") {
     const evSec1 = makeEv("ev_sec_rate", "$120 per hour", "Section 1.2");
     const evSec2 = makeEv("ev_sec_liab", "the Contractor disclaims all liability", "Section 2.1");
