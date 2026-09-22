@@ -44,7 +44,13 @@ export async function POST(
       await analyzeDocument(docB);
     }
 
-    const comparison = await compareDocuments(docA, docB);
+    const cacheKey = `cmp_${docA.id}_${docB.id}`;
+    let comparison = docA.comparisons?.[docB.id];
+    if (!comparison) {
+      comparison = await compareDocuments(docA, docB);
+      if (!docA.comparisons) docA.comparisons = {};
+      docA.comparisons[docB.id] = comparison;
+    }
 
     return NextResponse.json({
       comparison,

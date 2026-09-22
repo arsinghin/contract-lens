@@ -22,7 +22,12 @@ export async function POST(
       await analyzeDocument(doc);
     }
 
+    if (doc.lawyerPrep) {
+      return NextResponse.json({ lawyerPreparation: doc.lawyerPrep, cached: true });
+    }
+
     const prep = await generateLawyerPreparation(doc);
+    doc.lawyerPrep = prep;
     return NextResponse.json({ lawyerPreparation: prep });
   } catch (err: any) {
     console.error("Lawyer prep API error:", err);

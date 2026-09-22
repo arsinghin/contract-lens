@@ -24,6 +24,11 @@ export async function answerQuestion(
   doc: DocumentRecord,
   question: string
 ): Promise<QAResponse> {
+  const normQ = question.trim().toLowerCase();
+  if (doc.qaHistory && doc.qaHistory[normQ]) {
+    return doc.qaHistory[normQ];
+  }
+
   const rawText = doc.rawText || doc.pages.map((p) => p.text).join("\n\n");
 
   try {
@@ -78,11 +83,17 @@ export async function answerQuestion(
       createdAt: new Date().toISOString(),
     };
 
+    if (!doc.qaHistory) doc.qaHistory = {};
+    doc.qaHistory[normQ] = qaResponse;
+
     saveDocument(doc);
     return qaResponse;
   } catch (error) {
     console.warn("AI Q&A encountered issue, falling back to deterministic grounded evaluator:", error);
     const fallbackResponse = answerQuestionFallback(doc, question, rawText);
+    if (!doc.qaHistory) doc.qaHistory = {};
+    doc.qaHistory[normQ] = fallbackResponse;
+
     saveDocument(doc);
     return fallbackResponse;
   }

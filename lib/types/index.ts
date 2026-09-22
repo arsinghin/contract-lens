@@ -232,8 +232,11 @@ export interface DocumentRecord {
   timelineEvents: TimelineEvent[];
   findings: Finding[];
   questions: Question[];
+  qaHistory?: Record<string, QAResponse>;
   evidence: Record<string, Evidence>;
   analysisStatus: AnalysisStatus;
+  comparisons?: Record<string, Comparison>;
+  lawyerPrep?: LawyerPreparationOutput;
   createdAt: string;
   updatedAt: string;
 }

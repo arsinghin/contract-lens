@@ -2,6 +2,7 @@
 import { getGeminiClient } from "./gemini";
 import { GEMINI_MODEL, GEMINI_FALLBACK_MODELS } from "./config";
 import { GLOBAL_SYSTEM_INSTRUCTION } from "@/lib/prompts";
+import { aiCache } from "@/lib/cache/ai-cache";
 
 interface GenerateOptions {
   contents: string;
@@ -9,6 +10,7 @@ interface GenerateOptions {
   responseMimeType?: string;
   temperature?: number;
   timeoutMs?: number;
+  skipCache?: boolean;
 }
 
 function timeoutPromise<T>(ms: number, promise: Promise<T>): Promise<T> {
@@ -30,6 +32,16 @@ function timeoutPromise<T>(ms: number, promise: Promise<T>): Promise<T> {
 }
 
 export async function generateContentWithFallback(options: GenerateOptions): Promise<string> {
+  // Check cache for identical prompts (huge efficiency gain)
+  const cacheKey = (options.systemInstruction || "") + "::" + options.contents;
+  const hashedKey = `gemini_${cacheKey.length}_` + cacheKey.slice(0, 100);
+  if (!options.skipCache) {
+    const cached = aiCache.get<string>(hashedKey);
+    if (cached) {
+      return cached;
+    }
+  }
+
   const gemini = getGeminiClient();
   const modelsToTry = [GEMINI_MODEL, ...GEMINI_FALLBACK_MODELS];
   const timeoutMs = options.timeoutMs || 25000;
@@ -52,9 +64,11 @@ export async function generateContentWithFallback(options: GenerateOptions): Pro
         const response = await timeoutPromise(timeoutMs, call);
 
         if (response && response.text) {
+          aiCache.set(hashedKey, response.text);
           return response.text;
         }
       } catch (err: any) {
+
         console.warn(`Model ${model} (attempt ${attempt + 1}) call failed or timed out:`, err.message || err);
         lastError = err;
 

@@ -2,8 +2,12 @@
 import {
   Evidence,
   Clause,
+  ClauseCategory,
   Obligation,
+  DeadlineType,
   Finding,
+  FindingType,
+  FindingSeverity,
   TimelineEvent,
   Party,
   Page,
@@ -15,6 +19,72 @@ import {
   Comparison
 } from "@/lib/types";
 import { AIAnalysisResultSchema } from "@/lib/schemas";
+
+const VALID_CLAUSE_CATEGORIES: Set<ClauseCategory> = new Set([
+  "parties",
+  "term",
+  "payment",
+  "compensation",
+  "termination",
+  "renewal",
+  "confidentiality",
+  "intellectual_property",
+  "non_compete",
+  "non_solicitation",
+  "liability",
+  "indemnification",
+  "dispute_resolution",
+  "governing_law",
+  "notice",
+  "penalty",
+  "general",
+  "other",
+]);
+
+function toClauseCategory(input: string): ClauseCategory {
+  const normalized = input.toLowerCase().replace(/[\s-]+/g, "_") as ClauseCategory;
+  return VALID_CLAUSE_CATEGORIES.has(normalized) ? normalized : "other";
+}
+
+function toDeadlineType(input?: string | null): DeadlineType {
+  if (input === "specific_date" || input === "relative" || input === "event_based" || input === "not_specified") {
+    return input;
+  }
+  return "event_based";
+}
+
+const VALID_FINDING_TYPES: Set<FindingType> = new Set([
+  "inconsistency",
+  "ambiguity",
+  "missing_information",
+  "asymmetric_obligation",
+  "broad_restriction",
+  "cross_reference",
+  "unusual_clause",
+  "other",
+]);
+
+function toFindingType(input: string): FindingType {
+  const normalized = input.toLowerCase().replace(/[\s-]+/g, "_") as FindingType;
+  return VALID_FINDING_TYPES.has(normalized) ? normalized : "inconsistency";
+}
+
+function toFindingSeverity(input: string): FindingSeverity {
+  const lower = input.toLowerCase();
+  if (lower === "low" || lower === "medium" || lower === "high" || lower === "critical") {
+    return lower;
+  }
+  return "medium";
+}
+
+const VALID_DOC_TYPES = new Set<DocumentRecord["documentType"]>([
+  "employment", "rental", "nda", "service", "freelance", "vendor", "terms", "policy", "other"
+]);
+
+function toDocumentType(input: string): DocumentRecord["documentType"] {
+  const lower = input.toLowerCase() as DocumentRecord["documentType"];
+  return VALID_DOC_TYPES.has(lower) ? lower : "employment";
+}
 
 /**
  * Normalizes text for evidence matching (collapsing extra whitespace, trim)
@@ -124,7 +194,7 @@ export function validateAndTransformAnalysis(
       id: `clause_${documentId}_${idx + 1}`,
       documentId,
       sectionNumber: c.sectionNumber ?? undefined,
-      category: (c.category.toLowerCase().replace(/[\s-]+/g, "_") as any) || "other",
+      category: toClauseCategory(c.category),
       title: c.title,
       summary: c.summary,
       partyIds: [],
@@ -144,7 +214,7 @@ export function validateAndTransformAnalysis(
       action: o.action,
       condition: o.condition ?? undefined,
       deadline: o.deadline ?? undefined,
-      deadlineType: (o.deadlineType as any) || "event_based",
+      deadlineType: toDeadlineType(o.deadlineType),
       consequence: o.consequence ?? undefined,
       evidenceIds: [evId],
       confidence: typeof o.confidence === "number" ? Math.min(1, Math.max(0, o.confidence)) : 0.9,
@@ -178,10 +248,10 @@ export function validateAndTransformAnalysis(
     return {
       id: `find_${documentId}_${idx + 1}`,
       documentId,
-      type: (f.type.toLowerCase().replace(/[\s-]+/g, "_") as any) || "inconsistency",
+      type: toFindingType(f.type),
       title: f.title,
       description: f.description,
-      severity: (f.severity.toLowerCase() as any) || "medium",
+      severity: toFindingSeverity(f.severity),
       confidence: typeof f.confidence === "number" ? Math.min(1, Math.max(0, f.confidence)) : 0.85,
       evidenceIds: evIds,
       relatedClauseIds: [],
@@ -189,12 +259,7 @@ export function validateAndTransformAnalysis(
     };
   });
 
-  const validDocType: DocumentRecord["documentType"] =
-    ["employment", "rental", "nda", "service", "freelance", "vendor", "terms", "policy", "other"].includes(
-      parsed.documentType.toLowerCase()
-    )
-      ? (parsed.documentType.toLowerCase() as any)
-      : "employment";
+  const validDocType: DocumentRecord["documentType"] = toDocumentType(parsed.documentType);
 
   return {
     documentType: validDocType,
