@@ -1,0 +1,67 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>
+endobj
+4 0 obj
+<< /Length 1561 >>
+stream
+BT
+/F1 13 Tf
+45 745 Td
+(STANDARD COMMERCIAL REAL ESTATE LEASE AGREEMENT) Tj
+ET
+BT
+/F1 8.5 Tf
+45 715 Td
+12.5 TL
+(1. PARTIES AND PREMISES) '
+(Landlord: Pacific Coast Properties LLC. Tenant: Hyperion Software Systems Inc.) '
+(Premises: Suite 400, 500 Howard Street, San Francisco, California 94105.) '
+() '
+(2. TERM OF LEASE) '
+(Lease Term: Three \(3\) years commencing on June 1, 2025 and expiring May 31, 2028.) '
+() '
+(3. RENT & SECURITY DEPOSIT) '
+(Monthly Base Rent: $9,200.00 USD payable on the first day of each calendar month.) '
+(Late Fee: A charge of 5% is assessed on payments received after the fifth \(5th\) business day.) '
+(Security Deposit: $18,400.00 USD deposited into escrow upon execution of this lease.) '
+() '
+(4. USE OF PREMISES & RESTRICTIONS) '
+(The premises shall be used exclusively for general executive offices and software development.) '
+(No hazardous materials or excessive acoustic disturbance shall be permitted.) '
+() '
+(5. MAINTENANCE AND ALTERATIONS) '
+(Tenant maintains interior fixtures, cabling, and HVAC servicing. Landlord maintains exterior walls and roof.) '
+(Alterations exceeding $5,000 require prior written authorization from Landlord.) '
+() '
+(6. DEFAULT & CURE PERIODS) '
+(Monetary Default: 10 days written notice to cure overdue rent before initiation of eviction proceedings.) '
+(Non-Monetary Default: 30 days written notice to cure breach of covenants.) '
+() '
+(7. GOVERNING LAW & JURISDICTION) '
+(This Agreement is governed by the laws of California. Venue is proper exclusively in San Francisco County.) '
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000241 00000 n 
+0000001853 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+1923
+%%EOF

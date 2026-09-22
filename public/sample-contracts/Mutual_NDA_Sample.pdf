@@ -1,0 +1,63 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>
+endobj
+4 0 obj
+<< /Length 1416 >>
+stream
+BT
+/F1 13 Tf
+45 745 Td
+(MUTUAL NON-DISCLOSURE AGREEMENT \(CONFIDENTIALITY\)) Tj
+ET
+BT
+/F1 8.5 Tf
+45 715 Td
+12.5 TL
+(1. PURPOSE OF DISCLOSURE) '
+(The Parties intend to evaluate a potential strategic technology collaboration in machine learning legal analytics.) '
+() '
+(2. DEFINITION OF CONFIDENTIAL INFORMATION) '
+(Includes source code, algorithms, customer datasets, financial models, and patent disclosures marked Confidential.) '
+() '
+(3. DUTY OF PROTECTION & NON-DISCLOSURE) '
+(Each party agrees to safeguard disclosed information with at least reasonable care.) '
+(Confidential information shall be disclosed solely to personnel with a bona fide need to know.) '
+() '
+(4. EXCLUSIONS FROM CONFIDENTIALITY) '
+(Obligations do not apply to information that: \(a\) becomes public through no wrongful act; \(b\) is already known; or) '
+(\(c\) is independently developed without reference to the disclosed information.) '
+() '
+(5. TERM & SURVIVAL OBLIGATION) '
+(This Agreement remains in effect for two \(2\) years. Confidentiality covenants survive for five \(5\) years post-termination.) '
+() '
+(6. MANDATORY RETURN OR CERTIFIED DESTRUCTION) '
+(Within fourteen \(14\) days of receiving written notice, Receiving Party must destroy or return all materials.) '
+() '
+(7. REMEDIES & GOVERNING LAW) '
+(Breach justifies immediate injunctive relief without proof of actual monetary damages. Governed by Delaware law.) '
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000241 00000 n 
+0000001708 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+1778
+%%EOF

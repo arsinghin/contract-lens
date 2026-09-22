@@ -1,0 +1,59 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>
+endobj
+4 0 obj
+<< /Length 1309 >>
+stream
+BT
+/F1 13 Tf
+45 745 Td
+(MASTER PROFESSIONAL SERVICES AGREEMENT \(SaaS / VENDOR\)) Tj
+ET
+BT
+/F1 8.5 Tf
+45 715 Td
+12.5 TL
+(1. STATEMENT OF WORK & DELIVERABLES) '
+(Vendor: CloudSphere Solutions LLC. Client: Horizon Financial Technologies Corp.) '
+(Vendor shall deliver cloud security auditing, SOC2 readiness assessment, and infrastructure hardening.) '
+() '
+(2. PAYMENT TERMS & AUDIT RIGHTS) '
+(Contract Value: $75,000 USD payable across three milestones \(30% upfront, 40% draft delivery, 30% signoff\).) '
+(Invoices are payable Net 30 days. Client reserves the right to audit vendor logs once annually with 15 days notice.) '
+() '
+(3. SERVICE LEVEL AGREEMENT \(SLA\) & PENALTIES) '
+(Vendor guarantees 99.9% uptime for audit portal. Downtime exceeding 4 hours triggers a 10% credit penalty.) '
+() '
+(4. LIMITATION OF LIABILITY & INDEMNIFICATION) '
+(Total aggregate liability of either party shall be capped at 2x the total fees paid under this Agreement.) '
+(Exceptions: Gross negligence, willful misconduct, and breach of data security obligations are uncapped.) '
+() '
+(5. TERMINATION RIGHTS) '
+(Either party may terminate for convenience with forty-five \(45\) days prior written notice.) '
+(Immediate termination upon insolvency, bankruptcy petition, or material uncured breach after 15 days notice.) '
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000241 00000 n 
+0000001601 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+1671
+%%EOF

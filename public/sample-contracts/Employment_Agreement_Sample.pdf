@@ -1,0 +1,70 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>
+endobj
+4 0 obj
+<< /Length 1853 >>
+stream
+BT
+/F1 13 Tf
+45 745 Td
+(EMPLOYMENT AGREEMENT \(APEX GLOBAL & JANE DOE\)) Tj
+ET
+BT
+/F1 8.5 Tf
+45 715 Td
+12.5 TL
+(1. APPOINTMENT AND SCOPE OF WORK) '
+(The Company hereby engages Jane Doe as Senior Engineering Director effective February 1, 2025.) '
+() '
+(2. PROBATIONARY PERIOD & NOTICE) '
+(The initial ninety \(90\) days shall be a probationary period. Termination during probation requires 14 days notice.) '
+() '
+(3. COMPENSATION & EXPENSES) '
+(Base compensation: $185,000 per annum paid monthly. Medical and dental coverage provided.) '
+(Reimbursement of authorized business expenditures payable within 30 days of invoice receipt.) '
+() '
+(4. INTELLECTUAL PROPERTY & CONFIDENTIALITY) '
+(All inventions, software code, and documentation developed during employment are exclusive Company property.) '
+(Employee shall hold all proprietary trade secrets in strict confidence indefinitely.) '
+() '
+(5. RESTRICTIVE COVENANTS) '
+(Non-solicitation: Employee agrees not to solicit employees or clients for a duration of six \(6\) months.) '
+() '
+(6. TERMINATION FOR CAUSE) '
+(The Company may terminate employment immediately without notice in the event of gross negligence or felony conviction.) '
+() '
+(7. TERMINATION WITHOUT CAUSE \(CONTRADICTION FLAG\)) '
+(Section 7.2: Either party may terminate this agreement without cause by providing sixty \(60\) days advance written notice.) '
+() '
+(8. SEVERANCE ENTITLEMENT \(MISSING SCHEDULE FLAG\)) '
+(Upon termination without cause, Employee is entitled to severance pay computed under Schedule B \(Schedule B is omitted\).) '
+() '
+(9. DISPUTE RESOLUTION & NOTICE REQUIREMENTS) '
+(Section 9.1: Governing law: State of California. Mandatory binding arbitration under AAA rules in San Francisco.) '
+(Section 9.4: Any official notice under this Agreement shall require thirty \(30\) days prior written notice.) '
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000241 00000 n 
+0000002145 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+2215
+%%EOF

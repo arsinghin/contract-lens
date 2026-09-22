@@ -6,6 +6,7 @@ import {
   RefreshCw,
   Loader2,
   UploadCloud,
+  Download,
   CheckCircle2,
   AlertTriangle,
   Clock,
@@ -79,13 +80,24 @@ export function DocumentHeader({
             </button>
           </div>
 
-          {/* Upload control */}
-          <div className="flex items-center gap-2">
+          {/* Sample PDF Download & Upload control */}
+          <div className="flex flex-wrap items-center gap-2">
+            <a
+              id="link-download-sample-pdf"
+              href="/sample-contracts/Employment_Agreement_v1.pdf"
+              download="Employment_Agreement_v1.pdf"
+              title="Download test contract PDF to test upload"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-stone-50 hover:bg-stone-100 text-stone-700 border border-stone-200 transition-colors"
+            >
+              <Download className="w-3.5 h-3.5 text-stone-500" />
+              <span>Get Sample PDF</span>
+            </a>
+
             <label
               id="label-upload-doc"
-              className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-800 border border-stone-200 transition-colors"
+              className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-stone-900 hover:bg-stone-800 text-stone-50 border border-stone-900 transition-colors shadow-2xs"
             >
-              <UploadCloud className="w-3.5 h-3.5 text-stone-600" />
+              <UploadCloud className="w-3.5 h-3.5 text-stone-200" />
               <span>Upload PDF / Text</span>
               <input
                 id="input-upload-doc"

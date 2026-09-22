@@ -101,17 +101,29 @@ export async function POST(req: NextRequest) {
     if (file.type === "text/plain" || file.name.endsWith(".txt") || file.name.endsWith(".md")) {
       extractedText = buffer.toString("utf-8");
     } else {
-      // PDF or binary document: convert to printable characters / text stream
-      // or send as extracted string representation
-      extractedText = buffer.toString("utf-8");
-      // If predominantly non-printable binary, create a readable representation
+      // PDF or binary document: extract text from streams and text operations
       if (extractedText.includes("%PDF")) {
-        // Strip non-printable bytes or retain ASCII streams
-        extractedText = buffer
-          .toString("latin1")
-          .replace(/[^\x20-\x7E\t\n\r]/g, " ")
-          .replace(/\s+/g, " ")
-          .trim();
+        const textLiterals: string[] = [];
+        const rawStr = buffer.toString("latin1");
+        
+        // Extract text in parentheses before Tj, TJ, or '
+        const parenRegex = /\(([^)]+)\)\s*(?:Tj|'|")/g;
+        let pMatch;
+        while ((pMatch = parenRegex.exec(rawStr)) !== null) {
+          textLiterals.push(pMatch[1].replace(/\\([()\\])/g, "$1"));
+        }
+
+        if (textLiterals.length > 5) {
+          extractedText = textLiterals.join("\n").trim();
+        } else {
+          // Fallback: strip binary characters
+          extractedText = buffer
+            .toString("latin1")
+            .replace(/[^\x20-\x7E\t\n\r]/g, " ")
+            .replace(/\s+/g, " ")
+            .trim();
+        }
+
         if (extractedText.length < 50) {
           extractedText = `PDF Document: ${file.name}\nSize: ${Math.round(file.size / 1024)} KB\nUploaded: ${new Date().toISOString()}`;
         }
