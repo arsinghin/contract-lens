@@ -80,19 +80,6 @@ export function DocumentHeader({
             </button>
           </div>
 
-          {/* Sample PDF Download & Upload control */}
-          <div className="flex flex-wrap items-center gap-2">
-            <a
-              id="link-download-sample-pdf"
-              href="/sample-contracts/Employment_Agreement_v1.pdf"
-              download="Employment_Agreement_v1.pdf"
-              title="Download test contract PDF to test upload"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-stone-50 hover:bg-stone-100 text-stone-700 border border-stone-200 transition-colors"
-            >
-              <Download className="w-3.5 h-3.5 text-stone-500" />
-              <span>Get Sample PDF</span>
-            </a>
-
             <label
               id="label-upload-doc"
               className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-stone-900 hover:bg-stone-800 text-stone-50 border border-stone-900 transition-colors shadow-2xs"
@@ -107,7 +94,6 @@ export function DocumentHeader({
                 className="hidden"
               />
             </label>
-          </div>
         </div>
       </div>
 
@@ -146,14 +132,24 @@ export function DocumentHeader({
                 id="btn-reanalyze-doc"
                 onClick={onReanalyze}
                 disabled={analyzing}
-                className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-lg bg-stone-900 text-stone-50 hover:bg-stone-800 transition-colors shadow-xs disabled:opacity-50"
+                className={`inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg transition-colors shadow-xs disabled:opacity-50 ${
+                  activeDoc.analysisStatus === "completed"
+                    ? "bg-stone-900 text-stone-50 hover:bg-stone-800"
+                    : "bg-amber-600 text-stone-50 hover:bg-amber-700"
+                }`}
               >
                 {analyzing ? (
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : activeDoc.analysisStatus === "completed" ? (
+                  <RefreshCw className="w-3.5 h-3.5 text-amber-300" />
                 ) : (
-                  <RefreshCw className="w-3.5 h-3.5 text-amber-400" />
+                  <Sparkles className="w-3.5 h-3.5 text-amber-200" />
                 )}
-                <span>Re-analyze</span>
+                <span>
+                  {activeDoc.analysisStatus === "completed"
+                    ? "Re-analyze Document"
+                    : "Analyze Document"}
+                </span>
               </button>
             </div>
           </div>
@@ -192,9 +188,11 @@ export function DocumentHeader({
 
             <div>
               <span className="text-stone-500 block">Extraction Fidelity:</span>
-              <span className="font-medium text-emerald-700 flex items-center gap-1 mt-0.5">
+              <span className={`font-medium flex items-center gap-1 mt-0.5 ${
+                activeDoc.analysisStatus === "completed" ? "text-emerald-700" : "text-stone-500"
+              }`}>
                 <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                98.4% Evidence Grounded
+                {activeDoc.analysisStatus === "completed" ? "98.4% Evidence Grounded" : "Awaiting Analysis"}
               </span>
             </div>
           </div>

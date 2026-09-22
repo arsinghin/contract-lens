@@ -80,33 +80,28 @@ export function parseRawTextIntoPages(documentId: string, rawText: string): Page
 export function ensureSyntheticDocumentsSeeded(): void {
   for (const key of Object.keys(SYNTHETIC_DOCUMENTS)) {
     if (!documentsStore.has(key)) {
-      const seeded = getSeededDocumentRecord(key);
-      if (seeded) {
-        documentsStore.set(key, seeded);
-      } else {
-        const syn = SYNTHETIC_DOCUMENTS[key];
-        const pages = parseRawTextIntoPages(syn.id, syn.content);
-        const doc: DocumentRecord = {
-          id: syn.id,
-          name: syn.name,
-          mimeType: "text/plain",
-          pageCount: pages.length,
-          rawText: syn.content,
-          documentType: syn.documentType,
-          parties: [],
-          pages,
-          clauses: [],
-          obligations: [],
-          timelineEvents: [],
-          findings: [],
-          questions: [],
-          evidence: {},
-          analysisStatus: "completed",
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        };
-        documentsStore.set(syn.id, doc);
-      }
+      const syn = SYNTHETIC_DOCUMENTS[key];
+      const pages = parseRawTextIntoPages(syn.id, syn.content);
+      const doc: DocumentRecord = {
+        id: syn.id,
+        name: syn.name,
+        mimeType: "application/pdf",
+        pageCount: pages.length,
+        rawText: syn.content,
+        documentType: syn.documentType,
+        parties: [],
+        pages,
+        clauses: [],
+        obligations: [],
+        timelineEvents: [],
+        findings: [],
+        questions: [],
+        evidence: {},
+        analysisStatus: "uploaded",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      documentsStore.set(syn.id, doc);
     }
   }
 }

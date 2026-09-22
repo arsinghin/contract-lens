@@ -34,7 +34,7 @@ export async function answerQuestion(
       systemInstruction: GLOBAL_SYSTEM_INSTRUCTION,
       temperature: 0,
       responseMimeType: "application/json",
-      timeoutMs: 7000,
+      timeoutMs: 20000,
     });
 
     let parsedRaw: unknown;

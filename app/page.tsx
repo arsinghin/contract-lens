@@ -23,6 +23,9 @@ import {
   FileCheck,
   Clock,
   Loader2,
+  FileText,
+  UploadCloud,
+  ArrowRight,
 } from "lucide-react";
 
 export default function WorkspacePage() {
@@ -88,17 +91,15 @@ export default function WorkspacePage() {
   const activeDoc = documents.find((d) => d.id === selectedDocId) || documents[0];
 
   const handleSelectSample = async (sampleId: string) => {
-    setAnalyzing(true);
-    try {
-      // 1. Check if already in documents
-      const existing = documents.find((d) => d.id === sampleId);
-      if (existing && existing.analysisStatus === "completed") {
-        setSelectedDocId(existing.id);
-        setAnalyzing(false);
-        return;
-      }
+    // 1. Check if already in documents list
+    const existing = documents.find((d) => d.id === sampleId);
+    if (existing) {
+      setSelectedDocId(existing.id);
+      return;
+    }
 
-      // 2. Load and analyze
+    // 2. If not loaded in client state, fetch or upload sample definition
+    try {
       const uploadRes = await fetch("/api/documents", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -106,19 +107,10 @@ export default function WorkspacePage() {
       });
       const uploadData = await uploadRes.json();
       const docId = uploadData.documentId;
-
-      // 3. Trigger analysis
-      const analyzeRes = await fetch(`/api/documents/${docId}/analyze`, {
-        method: "POST",
-      });
-      const analyzeData = await analyzeRes.json();
-
       await fetchDocuments();
       setSelectedDocId(docId);
     } catch (err) {
       console.error("Error loading sample", err);
-    } finally {
-      setAnalyzing(false);
     }
   };
 
@@ -295,55 +287,101 @@ export default function WorkspacePage() {
             </p>
           </div>
         ) : activeDoc ? (
-          <div>
-            {activeTab === "findings" && (
-              <FindingsView
-                findings={activeDoc.findings}
-                evidenceMap={activeDoc.evidence}
-                onSelectEvidence={handleOpenEvidence}
-              />
-            )}
+          activeDoc.analysisStatus !== "completed" ? (
+            <div className="bg-white border border-stone-200 rounded-xl p-8 sm:p-12 text-center space-y-5 shadow-xs">
+              <div className="w-12 h-12 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center mx-auto text-amber-600">
+                <FileText className="w-6 h-6" />
+              </div>
+              <div className="space-y-1.5 max-w-lg mx-auto">
+                <h3 className="text-base font-bold text-stone-900">
+                  {activeDoc.name}
+                </h3>
+                <p className="text-xs text-stone-600 leading-relaxed">
+                  This document is loaded and ready. Trigger the LexLens pipeline to extract clauses, identify obligations, compute timeline events, and run grounded legal inconsistency checks.
+                </p>
+              </div>
 
-            {activeTab === "clauses" && (
-              <ClauseExplorer
-                clauses={activeDoc.clauses}
-                evidenceMap={activeDoc.evidence}
-                onSelectEvidence={handleOpenEvidence}
-              />
-            )}
+              <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+                <button
+                  id="btn-analyze-loaded-doc"
+                  onClick={handleReanalyze}
+                  disabled={analyzing}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs font-semibold bg-amber-600 hover:bg-amber-700 text-stone-50 shadow-xs transition-colors disabled:opacity-50"
+                >
+                  <Sparkles className="w-4 h-4 text-amber-200" />
+                  <span>Analyze This Document</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
 
-            {activeTab === "obligations" && (
-              <ObligationExplorer
-                obligations={activeDoc.obligations}
-                evidenceMap={activeDoc.evidence}
-                onSelectEvidence={handleOpenEvidence}
-              />
-            )}
+                <button
+                  id="btn-inspect-loaded-doc"
+                  onClick={() => setShowFullDoc(true)}
+                  className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-xs font-medium bg-stone-100 hover:bg-stone-200 text-stone-800 border border-stone-200 transition-colors"
+                >
+                  <FileText className="w-3.5 h-3.5 text-stone-600" />
+                  <span>View Raw Text</span>
+                </button>
+              </div>
 
-            {activeTab === "qa" && (
-              <QASection
-                documentId={activeDoc.id}
-                evidenceMap={activeDoc.evidence}
-                onSelectEvidence={handleOpenEvidence}
-              />
-            )}
+              <div className="pt-4 border-t border-stone-100 flex items-center justify-center gap-4 text-[11px] text-stone-400">
+                <span>{activeDoc.pageCount || activeDoc.pages.length} page(s)</span>
+                <span>•</span>
+                <span>{(activeDoc.rawText || "").trim().split(/\s+/).filter(Boolean).length} words</span>
+                <span>•</span>
+                <span>Status: Loaded (Unanalyzed)</span>
+              </div>
+            </div>
+          ) : (
+            <div>
+              {activeTab === "findings" && (
+                <FindingsView
+                  findings={activeDoc.findings}
+                  evidenceMap={activeDoc.evidence}
+                  onSelectEvidence={handleOpenEvidence}
+                />
+              )}
 
-            {activeTab === "timeline" && (
-              <TimelineView
-                events={activeDoc.timelineEvents || []}
-                evidenceMap={activeDoc.evidence}
-                onSelectEvidence={handleOpenEvidence}
-              />
-            )}
+              {activeTab === "clauses" && (
+                <ClauseExplorer
+                  clauses={activeDoc.clauses}
+                  evidenceMap={activeDoc.evidence}
+                  onSelectEvidence={handleOpenEvidence}
+                />
+              )}
 
-            {activeTab === "lawyer_prep" && (
-              <LawyerPrepView
-                document={activeDoc}
-                evidenceMap={activeDoc.evidence}
-                onSelectEvidence={handleOpenEvidence}
-              />
-            )}
-          </div>
+              {activeTab === "obligations" && (
+                <ObligationExplorer
+                  obligations={activeDoc.obligations}
+                  evidenceMap={activeDoc.evidence}
+                  onSelectEvidence={handleOpenEvidence}
+                />
+              )}
+
+              {activeTab === "qa" && (
+                <QASection
+                  documentId={activeDoc.id}
+                  evidenceMap={activeDoc.evidence}
+                  onSelectEvidence={handleOpenEvidence}
+                />
+              )}
+
+              {activeTab === "timeline" && (
+                <TimelineView
+                  events={activeDoc.timelineEvents || []}
+                  evidenceMap={activeDoc.evidence}
+                  onSelectEvidence={handleOpenEvidence}
+                />
+              )}
+
+              {activeTab === "lawyer_prep" && (
+                <LawyerPrepView
+                  document={activeDoc}
+                  evidenceMap={activeDoc.evidence}
+                  onSelectEvidence={handleOpenEvidence}
+                />
+              )}
+            </div>
+          )
         ) : (
           <div className="bg-white border border-stone-200 rounded-xl p-12 text-center text-xs text-stone-500">
             No document selected. Choose a sample from the bar above.
