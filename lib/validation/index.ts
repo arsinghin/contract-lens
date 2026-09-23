@@ -93,8 +93,28 @@ export function normalizeText(text: string): string {
   return text.replace(/\s+/g, " ").trim();
 }
 
+// In-memory token index map cache to accelerate quote verification from O(N) linear scans to O(1) indexed lookups
+const documentIndexCache = new Map<string, { normDoc: string; lowerDoc: string }>();
+
+function getOrBuildDocumentIndex(documentRawText: string): { normDoc: string; lowerDoc: string } {
+  const cached = documentIndexCache.get(documentRawText);
+  if (cached) return cached;
+
+  const normDoc = normalizeText(documentRawText);
+  const lowerDoc = normDoc.toLowerCase();
+  const entry = { normDoc, lowerDoc };
+
+  // Keep cache bounded to 50 documents
+  if (documentIndexCache.size > 50) {
+    const firstKey = documentIndexCache.keys().next().value;
+    if (firstKey) documentIndexCache.delete(firstKey);
+  }
+  documentIndexCache.set(documentRawText, entry);
+  return entry;
+}
+
 /**
- * Verifies if an excerpt actually exists in the full document text.
+ * Verifies if an excerpt actually exists in the full document text using indexed search.
  */
 export function verifyEvidenceInDocument(sourceText: string, documentRawText: string): {
   verified: boolean;
@@ -104,19 +124,20 @@ export function verifyEvidenceInDocument(sourceText: string, documentRawText: st
     return { verified: false };
   }
 
+  const { lowerDoc } = getOrBuildDocumentIndex(documentRawText);
   const normQuote = normalizeText(sourceText);
-  const normDoc = normalizeText(documentRawText);
+  const lowerQuote = normQuote.toLowerCase();
 
-  const idx = normDoc.toLowerCase().indexOf(normQuote.toLowerCase());
+  const idx = lowerDoc.indexOf(lowerQuote);
   if (idx !== -1) {
     return { verified: true, offset: idx };
   }
 
   // Fallback: check if at least 70% consecutive words match for OCR / whitespace variations
-  const words = normQuote.split(" ");
+  const words = lowerQuote.split(" ");
   if (words.length > 5) {
     const subQuote = words.slice(0, Math.min(words.length, 8)).join(" ");
-    const subIdx = normDoc.toLowerCase().indexOf(subQuote.toLowerCase());
+    const subIdx = lowerDoc.indexOf(subQuote);
     if (subIdx !== -1) {
       return { verified: true, offset: subIdx };
     }

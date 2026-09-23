@@ -187,7 +187,13 @@ export function ComparisonWorkspace({
                         Document A ({docA?.name || "Original"})
                       </div>
                       <p className="font-serif text-stone-800 italic">
-                        {diff.documentAText ? `"${diff.documentAText}"` : "(Not present in Document A)"}
+                        {diff.documentAText ? (
+                          <del className="no-underline text-rose-900 bg-rose-50/75 px-1 py-0.5 rounded border border-rose-100" aria-label={`Original baseline text: ${diff.documentAText}`}>
+                            &ldquo;{diff.documentAText}&rdquo;
+                          </del>
+                        ) : (
+                          <span className="text-stone-400 italic" aria-label="Not present in baseline document">(Not present in Document A)</span>
+                        )}
                       </p>
                     </div>
 
@@ -215,7 +221,13 @@ export function ComparisonWorkspace({
                         Document B ({docB?.name || "Revised"})
                       </div>
                       <p className="font-serif text-stone-800 italic">
-                        {diff.documentBText ? `"${diff.documentBText}"` : "(Not present in Document B)"}
+                        {diff.documentBText ? (
+                          <ins className="no-underline text-emerald-900 bg-emerald-50/75 px-1 py-0.5 rounded border border-emerald-100" aria-label={`Revised text: ${diff.documentBText}`}>
+                            &ldquo;{diff.documentBText}&rdquo;
+                          </ins>
+                        ) : (
+                          <span className="text-stone-400 italic" aria-label="Not present in revised document">(Not present in Document B)</span>
+                        )}
                       </p>
                     </div>
 

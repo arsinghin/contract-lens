@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { DocumentRecord, Evidence } from "@/lib/types";
+import { useWorkspace } from "@/lib/hooks/useWorkspace";
 import { Navbar } from "@/components/Navbar";
 import { EvidenceViewerModal } from "@/components/evidence/EvidenceViewerModal";
 import { FullDocumentModal } from "@/components/documents/FullDocumentModal";
@@ -29,168 +28,26 @@ import {
 } from "lucide-react";
 
 export default function WorkspacePage() {
-  const [documents, setDocuments] = useState<DocumentRecord[]>([]);
-  const [selectedDocId, setSelectedDocId] = useState<string>("employment-v1");
-  const [activeTab, setActiveTab] = useState<
-    "findings" | "clauses" | "obligations" | "qa" | "timeline" | "lawyer_prep"
-  >("findings");
-  const [analyzing, setAnalyzing] = useState(false);
-  const [loadingDocs, setLoadingDocs] = useState(true);
-
-  // Evidence Modal State
-  const [activeEvidence, setActiveEvidence] = useState<{
-    evidence: Evidence;
-    interpretation?: string;
-    title?: string;
-  } | null>(null);
-
-  // Full Document Text Modal State
-  const [showFullDoc, setShowFullDoc] = useState(false);
-  const [uploadError, setUploadError] = useState<string | null>(null);
-
-  // Load documents on mount
-  const fetchDocuments = async () => {
-    try {
-      const res = await fetch("/api/documents");
-      const data = await res.json();
-      if (data.documents && data.documents.length > 0) {
-        setDocuments(data.documents);
-        setSelectedDocId((prev) =>
-          prev && data.documents.some((d: any) => d.id === prev) ? prev : data.documents[0].id
-        );
-      }
-    } catch (err) {
-      console.error("Failed to load documents", err);
-    } finally {
-      setLoadingDocs(false);
-    }
-  };
-
-  useEffect(() => {
-    let mounted = true;
-    fetch("/api/documents")
-      .then((res) => res.json())
-      .then((data) => {
-        if (!mounted) return;
-        if (data.documents && data.documents.length > 0) {
-          setDocuments(data.documents);
-          setSelectedDocId((prev) =>
-            prev && data.documents.some((d: any) => d.id === prev) ? prev : data.documents[0].id
-          );
-        }
-      })
-      .catch((err) => console.error("Failed to load documents", err))
-      .finally(() => {
-        if (mounted) setLoadingDocs(false);
-      });
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  const activeDoc = documents.find((d) => d.id === selectedDocId) || documents[0];
-
-  const handleSelectSample = async (sampleId: string) => {
-    // 1. Check if already in documents list
-    const existing = documents.find((d) => d.id === sampleId);
-    if (existing) {
-      setSelectedDocId(existing.id);
-      return;
-    }
-
-    // 2. If not loaded in client state, fetch or upload sample definition
-    try {
-      const uploadRes = await fetch("/api/documents", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sampleId }),
-      });
-      const uploadData = await uploadRes.json();
-      const docId = uploadData.documentId;
-      await fetchDocuments();
-      setSelectedDocId(docId);
-    } catch (err) {
-      console.error("Error loading sample", err);
-    }
-  };
-
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setAnalyzing(true);
-    setUploadError(null);
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-
-      const uploadRes = await fetch("/api/documents", {
-        method: "POST",
-        body: formData,
-      });
-
-      const contentType = uploadRes.headers.get("content-type") || "";
-      if (!contentType.includes("application/json")) {
-        const textBody = await uploadRes.text();
-        throw new Error(
-          uploadRes.status === 413
-            ? "The uploaded file exceeds the 10MB upload limit."
-            : uploadRes.status === 429
-            ? "Upload rate limit reached. Please wait a minute and retry."
-            : `Server returned non-JSON response (${uploadRes.status}): ${textBody.substring(0, 100)}`
-        );
-      }
-
-      const uploadData = await uploadRes.json();
-      if (!uploadRes.ok || uploadData.error) {
-        throw new Error(uploadData.error?.message || "Failed to upload document");
-      }
-
-      const docId = uploadData.documentId;
-
-      // Analyze newly uploaded document
-      const analyzeRes = await fetch(`/api/documents/${docId}/analyze`, { method: "POST" });
-      const analyzeContentType = analyzeRes.headers.get("content-type") || "";
-      if (analyzeContentType.includes("application/json")) {
-        const analyzeData = await analyzeRes.json();
-        if (analyzeData.error) {
-          console.warn("Auto-analysis had a warning:", analyzeData.error);
-        }
-      }
-
-      await fetchDocuments();
-      setSelectedDocId(docId);
-    } catch (err: any) {
-      console.error("Error uploading file", err);
-      setUploadError(err.message || "An unexpected error occurred while uploading the document.");
-    } finally {
-      setAnalyzing(false);
-      // Reset input value so re-uploading the same file triggers onChange
-      e.target.value = "";
-    }
-  };
-
-  const handleReanalyze = async () => {
-    if (!activeDoc) return;
-    setAnalyzing(true);
-    try {
-      await fetch(`/api/documents/${activeDoc.id}/analyze`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ force: true }),
-      });
-      await fetchDocuments();
-    } catch (err) {
-      console.error("Re-analysis failed", err);
-    } finally {
-      setAnalyzing(false);
-    }
-  };
-
-  const handleOpenEvidence = (ev: Evidence, interpretation?: string, title?: string) => {
-    setActiveEvidence({ evidence: ev, interpretation, title });
-  };
+  const {
+    documents,
+    selectedDocId,
+    setSelectedDocId,
+    activeDoc,
+    activeTab,
+    setActiveTab,
+    analyzing,
+    loadingDocs,
+    uploadError,
+    setUploadError,
+    activeEvidence,
+    showFullDoc,
+    setShowFullDoc,
+    handleOpenEvidence,
+    handleCloseEvidence,
+    handleSelectSample,
+    handleFileUpload,
+    handleReanalyze,
+  } = useWorkspace();
 
   return (
     <div className="min-h-screen bg-stone-100/60 text-stone-900 flex flex-col font-sans">
@@ -238,8 +95,12 @@ export default function WorkspacePage() {
 
         {/* Tab Navigation */}
         <div className="border-b border-stone-200">
-          <nav className="flex space-x-1 sm:space-x-4 overflow-x-auto text-xs font-medium">
+          <nav className="flex space-x-1 sm:space-x-4 overflow-x-auto text-xs font-medium" role="tablist" aria-label="Document Analysis Views">
             <button
+              role="tab"
+              aria-selected={activeTab === "findings"}
+              aria-controls="panel-findings"
+              id="tab-findings"
               onClick={() => setActiveTab("findings")}
               className={`pb-3 px-3 flex items-center gap-1.5 border-b-2 transition-colors whitespace-nowrap ${
                 activeTab === "findings"
@@ -257,6 +118,10 @@ export default function WorkspacePage() {
             </button>
 
             <button
+              role="tab"
+              aria-selected={activeTab === "clauses"}
+              aria-controls="panel-clauses"
+              id="tab-clauses"
               onClick={() => setActiveTab("clauses")}
               className={`pb-3 px-3 flex items-center gap-1.5 border-b-2 transition-colors whitespace-nowrap ${
                 activeTab === "clauses"
@@ -272,6 +137,10 @@ export default function WorkspacePage() {
             </button>
 
             <button
+              role="tab"
+              aria-selected={activeTab === "obligations"}
+              aria-controls="panel-obligations"
+              id="tab-obligations"
               onClick={() => setActiveTab("obligations")}
               className={`pb-3 px-3 flex items-center gap-1.5 border-b-2 transition-colors whitespace-nowrap ${
                 activeTab === "obligations"
@@ -287,6 +156,10 @@ export default function WorkspacePage() {
             </button>
 
             <button
+              role="tab"
+              aria-selected={activeTab === "qa"}
+              aria-controls="panel-qa"
+              id="tab-qa"
               onClick={() => setActiveTab("qa")}
               className={`pb-3 px-3 flex items-center gap-1.5 border-b-2 transition-colors whitespace-nowrap ${
                 activeTab === "qa"
@@ -299,6 +172,10 @@ export default function WorkspacePage() {
             </button>
 
             <button
+              role="tab"
+              aria-selected={activeTab === "timeline"}
+              aria-controls="panel-timeline"
+              id="tab-timeline"
               onClick={() => setActiveTab("timeline")}
               className={`pb-3 px-3 flex items-center gap-1.5 border-b-2 transition-colors whitespace-nowrap ${
                 activeTab === "timeline"
@@ -311,6 +188,10 @@ export default function WorkspacePage() {
             </button>
 
             <button
+              role="tab"
+              aria-selected={activeTab === "lawyer_prep"}
+              aria-controls="panel-lawyer-prep"
+              id="tab-lawyer-prep"
               onClick={() => setActiveTab("lawyer_prep")}
               className={`pb-3 px-3 flex items-center gap-1.5 border-b-2 transition-colors whitespace-nowrap ${
                 activeTab === "lawyer_prep"
@@ -325,6 +206,7 @@ export default function WorkspacePage() {
         </div>
 
         {/* Tab Content Display */}
+        <div role="region" aria-live="polite" aria-atomic="false">
         {analyzing ? (
           <div className="bg-white border border-stone-200 rounded-xl p-12 text-center space-y-3">
             <Loader2 className="w-8 h-8 text-amber-500 animate-spin mx-auto" />
@@ -436,6 +318,7 @@ export default function WorkspacePage() {
             No document selected. Choose a sample from the bar above.
           </div>
         )}
+        </div>
       </main>
 
       <footer className="mt-16 py-6 border-t border-stone-200 bg-stone-50 text-center text-xs text-stone-500">
@@ -457,9 +340,9 @@ export default function WorkspacePage() {
         evidence={activeEvidence?.evidence || null}
         interpretation={activeEvidence?.interpretation}
         title={activeEvidence?.title}
-        onClose={() => setActiveEvidence(null)}
+        onClose={handleCloseEvidence}
         onOpenFullDocument={() => {
-          setActiveEvidence(null);
+          handleCloseEvidence();
           setShowFullDoc(true);
         }}
       />

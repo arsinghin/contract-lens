@@ -5,8 +5,21 @@ import { DocumentRecord, Page, Section, Evidence } from "@/lib/types";
 import { SYNTHETIC_DOCUMENTS } from "@/lib/data/synthetic-documents";
 import { getSeededDocumentRecord } from "@/lib/data/ground-truth-seed";
 
-// In-memory document store
+// In-memory document store with LRU eviction to prevent unbounded memory growth
+const MAX_DOCUMENTS = 50;
 const documentsStore: Map<string, DocumentRecord> = new Map();
+
+function evictOldestIfNeeded(): void {
+  if (documentsStore.size > MAX_DOCUMENTS) {
+    // Keep synthetic documents intact, evict oldest user upload
+    for (const [id, doc] of documentsStore.entries()) {
+      if (!SYNTHETIC_DOCUMENTS[id] && !id.startsWith("syn_")) {
+        documentsStore.delete(id);
+        break;
+      }
+    }
+  }
+}
 
 /**
  * Splits raw document text into simulated pages and sections.
@@ -129,6 +142,7 @@ export function getDocumentById(id: string): DocumentRecord | undefined {
 export function saveDocument(doc: DocumentRecord): DocumentRecord {
   doc.updatedAt = new Date().toISOString();
   documentsStore.set(doc.id, doc);
+  evictOldestIfNeeded();
   return doc;
 }
 
@@ -137,6 +151,7 @@ export function createDocumentFromUpload(
   rawText: string,
   mimeType: "application/pdf" | "text/plain" = "application/pdf"
 ): DocumentRecord {
+  evictOldestIfNeeded();
   const id = `doc_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
   const pages = parseRawTextIntoPages(id, rawText);
 
